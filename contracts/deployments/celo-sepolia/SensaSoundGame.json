@@ -3,9 +3,11 @@
   "chainId": 11142220,
   "devTreasury": "0x351675d772326d4700ff289bf15F45d5CBE5aa3c",
   "implementation": "0x1C5671A47FE93d09E52Cfe23fCfd9d7d4Bde5D4b",
+  "implementationExplorerUrl": "https://celo-sepolia.blockscout.com/address/0x1c5671a47fe93d09e52cfe23fcfd9d7d4bde5d4b",
   "initialReserveRaw": 0,
   "owner": "0x351675d772326d4700ff289bf15F45d5CBE5aa3c",
   "proxy": "0xB33e13bd00d562Ea9dBffAC0b84540742670AC00",
+  "proxyExplorerUrl": "https://celo-sepolia.blockscout.com/address/0xb33e13bd00d562ea9dbffac0b84540742670ac00",
   "signer": "0xad4B18E31642fA3f3Bc657904C40c34fae02B554",
   "token": "0x01C5C0122039549AD1493B8220cABEdD739BC44E"
 }
