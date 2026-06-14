@@ -27,11 +27,12 @@ contract SensaSoundGameUpgradeable is
     }
 
     enum Tier {
-        LOSE,
-        BEP,
+        MISS,
+        MEH,
+        OK,
         GOOD,
         GREAT,
-        JACKPOT
+        WHAT
     }
 
     IERC20 public token;

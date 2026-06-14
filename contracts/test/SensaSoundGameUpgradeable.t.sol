@@ -102,7 +102,7 @@ contract SensaSoundGameUpgradeableTest is Test {
         rewards = new uint256[](1);
         rewards[0] = reward;
         tiers = new SensaSoundGameUpgradeable.Tier[](1);
-        tiers[0] = SensaSoundGameUpgradeable.Tier.JACKPOT;
+        tiers[0] = SensaSoundGameUpgradeable.Tier.WHAT;
         scores = new uint256[](1);
         scores[0] = 9800;
     }
