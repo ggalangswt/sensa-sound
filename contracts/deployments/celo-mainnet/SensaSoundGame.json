@@ -1,0 +1,11 @@
+{
+  "backendSigner": "0x351675d772326d4700ff289bf15F45d5CBE5aa3c",
+  "chainId": 42220,
+  "devTreasury": "0x351675d772326d4700ff289bf15F45d5CBE5aa3c",
+  "implementation": "0x0A85bFfD10b4b60731A4fF13725fee7984708507",
+  "initialReserveRaw": 0,
+  "owner": "0x351675d772326d4700ff289bf15F45d5CBE5aa3c",
+  "proxy": "0x8b9F6D1Fe883fB9e158e4AFB3c3cFcb8e1DbaF9a",
+  "signer": "0xad4B18E31642fA3f3Bc657904C40c34fae02B554",
+  "token": "0xcebA9300f2b948710d2653dD7B07f33A8B32118C"
+}
