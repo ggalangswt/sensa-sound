@@ -8,6 +8,7 @@ import {SensaSoundGameUpgradeable} from "../src/SensaSoundGameUpgradeable.sol";
 
 contract DeploySensaSound is Script {
     address internal constant CELO_SEPOLIA_USDC = 0x01C5C0122039549AD1493B8220cABEdD739BC44E;
+    address internal constant CELO_MAINNET_USDC = 0xcebA9300f2b948710d2653dD7B07f33A8B32118C;
 
     function run() external {
         uint256 deployerPk = vm.envUint("PRIVATE_KEY");
@@ -17,7 +18,8 @@ contract DeploySensaSound is Script {
         address deployer = vm.addr(deployerPk);
         address signer = vm.addr(signerPk);
         address backendSigner = vm.addr(backendPk);
-        address token = vm.envOr("USDC_ADDRESS", CELO_SEPOLIA_USDC);
+        address defaultToken = block.chainid == 42220 ? CELO_MAINNET_USDC : CELO_SEPOLIA_USDC;
+        address token = vm.envOr("USDC_ADDRESS", defaultToken);
         address devTreasury = vm.envOr("DEV_TREASURY_ADDRESS", deployer);
         uint256 initialReserve = vm.envOr("INITIAL_RESERVE_USDC", uint256(0));
         uint256 initialReserveRaw = initialReserve * 1e6;
@@ -62,6 +64,9 @@ contract DeploySensaSound is Script {
         vm.serializeAddress(key, "backendSigner", backendSigner);
         vm.serializeAddress(key, "devTreasury", devTreasury);
         string memory json = vm.serializeUint(key, "initialReserveRaw", initialReserveRaw);
-        vm.writeJson(json, "deployments/celo-sepolia/SensaSoundGame.json");
+        string memory deploymentPath = block.chainid == 42220
+            ? "deployments/celo-mainnet/SensaSoundGame.json"
+            : "deployments/celo-sepolia/SensaSoundGame.json";
+        vm.writeJson(json, deploymentPath);
     }
 }
