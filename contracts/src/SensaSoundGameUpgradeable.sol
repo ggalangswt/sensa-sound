@@ -54,7 +54,9 @@ contract SensaSoundGameUpgradeable is
     mapping(bytes32 => bool) public roundResolved;
     mapping(bytes32 => bool) public roundRefunded;
     uint256 private _reentrancyStatus;
+    uint256 public playCount;
 
+    event GamePlayed(address indexed player, uint256 playCount, uint256 timestamp);
     event StakeDeposited(bytes32 indexed roundId, address indexed player, uint256 amount, Mode mode);
     event RoundResolved(bytes32 indexed roundId, address indexed winner, uint256 score, Tier tier, uint256 reward);
     event Withdrawn(address indexed user, uint256 amount);
@@ -243,6 +245,11 @@ contract SensaSoundGameUpgradeable is
         balances[msg.sender] = 0;
         token.safeTransfer(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
+    }
+
+    function play() external notPaused returns (uint256 currentPlayCount) {
+        currentPlayCount = ++playCount;
+        emit GamePlayed(msg.sender, currentPlayCount, block.timestamp);
     }
 
     function refundStake(bytes32 roundId) external onlyBackend nonReentrant {
