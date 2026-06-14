@@ -175,6 +175,27 @@ contract SensaSoundGameUpgradeableTest is Test {
         assertEq(usdc.balanceOf(alice), 1_000 * 1e6 - 10 * 1e6 + 16 * 1e6);
     }
 
+    function testPlayIncrementsCounter() public {
+        vm.prank(alice);
+        uint256 first = game.play();
+
+        vm.prank(bob);
+        uint256 second = game.play();
+
+        assertEq(first, 1);
+        assertEq(second, 2);
+        assertEq(game.playCount(), 2);
+    }
+
+    function testPlayBlockedWhenPaused() public {
+        vm.prank(owner);
+        game.setPaused(true);
+
+        vm.prank(alice);
+        vm.expectRevert(SensaSoundGameUpgradeable.GamePaused.selector);
+        game.play();
+    }
+
     function testTieSplitCreditsMultipleWinners() public {
         bytes32 roundId = keccak256("tie-split");
         vm.prank(alice);
