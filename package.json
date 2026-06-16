@@ -13,7 +13,10 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
-    "test": "vitest run",
+    "game:dev": "vite --config gameplay/vite.config.ts",
+    "game:build": "vite build --config gameplay/vite.config.ts",
+    "game:preview": "vite preview --config gameplay/vite.config.ts --host 127.0.0.1 --port 4173",
+    "test": "vitest run test/sound.test.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
@@ -23,6 +26,7 @@
     "@types/node": "^24.0.3",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
+    "vite": "^7.1.3",
     "vitest": "^3.2.4"
   }
 }
