@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { buildDailySeed, buildSettlementPreview, generateSoundRounds, scoreSoundSubmission } from "../src/index";
+import {
+  buildDailySeed,
+  buildSettlementPreview,
+  buildSoundGameplayConfig,
+  generateSoundRounds,
+  scoreSoundSubmission,
+} from "../src/index";
 
 describe("sound engine", () => {
   it("generates deterministic rounds for a stable seed", () => {
@@ -12,16 +18,22 @@ describe("sound engine", () => {
   });
 
   it("scores within the 0-50 bounds", () => {
-    const rounds = generateSoundRounds("score-seed", "hard");
+    const config = buildSoundGameplayConfig({
+      matchId: "score-seed",
+      difficulty: "hard",
+    });
     const result = scoreSoundSubmission("score-seed", "hard", {
       roomId: "room_1",
       walletAddress: "0x1",
       submittedAt: new Date().toISOString(),
-      guesses: rounds.map((round) => ({
+      difficulty: "hard",
+      octaveShift: 0,
+      totalScore: 0,
+      rounds: config.rounds.map((round) => ({
         round: round.round,
-        guessedHz: round.frequencyHz,
-        latencyMs: 800
-      }))
+        pickedNorm: round.targetNorm,
+        latencyMs: 800,
+      })),
     });
 
     expect(result.total).toBeGreaterThanOrEqual(0);
