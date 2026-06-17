@@ -44,7 +44,7 @@ contract SensaSoundGameUpgradeable is
     uint256 public totalDevRakeAccumulated;
 
     uint256 public constant MAX_PLAYERS_PER_ROUND = 5;
-    uint256 public constant MIN_STAKE = 1 * 1e6;
+    uint256 public constant MIN_STAKE = 200_000;
     uint256 private constant _NOT_ENTERED = 1;
     uint256 private constant _ENTERED = 2;
 
