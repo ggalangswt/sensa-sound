@@ -15,6 +15,13 @@ const totalRounds = document.getElementById('total-rounds')!;
 const totalClose = document.getElementById('total-close')!;
 const totalPlayAgainBtn = document.getElementById('total-play-again')!;
 
+function exitToSoundMenu() {
+  window.parent?.postMessage({ type: 'sensa-sound:exit' }, '*');
+  if (window.parent === window) {
+    window.location.href = '/play/sound/';
+  }
+}
+
 export async function showTotal() {
   show(totalScreen);
   analytics.log('game_end', { score: state.totalScore, mode: hardMode ? 'hard' : 'easy', octave: octaveShift });
@@ -59,5 +66,5 @@ if (totalPlayAgainBtn) {
 totalClose.addEventListener('click', () => {
   SFX.clickClose();
   totalScreen.classList.remove('reveal');
-  startGame();
+  exitToSoundMenu();
 });
