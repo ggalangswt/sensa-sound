@@ -1,11 +1,11 @@
 import './style.css';
 import { initAudioListeners } from './audio/context';
 import { initAllShimmers } from './utils/dom';
-import { startIntroWave } from './visual/intro-wave';
 import { initDarkMode } from './ui/dark-mode';
 import { initMuteToggle } from './ui/mute-toggle';
 import { initAudioGate } from './ui/audio-gate';
 import { initSfxGuard } from './ui/sfx-guard';
+import { startGame } from './screens/game-flow';
 
 // Import screens to register their event listeners
 import './screens/intro';
@@ -37,7 +37,6 @@ initAudioGate();
 // Wait for fonts, then reveal
 document.fonts.ready.then(() => {
   document.body.classList.add('ready');
-  startIntroWave();
   initAllShimmers();
   initSfxGuard();
 });
@@ -46,3 +45,7 @@ document.fonts.ready.then(() => {
 setTimeout(() => {
   document.body.classList.add('ready');
 }, 2000);
+
+window.addEventListener('sensa:audio-ready', () => {
+  startGame();
+}, { once: true });
