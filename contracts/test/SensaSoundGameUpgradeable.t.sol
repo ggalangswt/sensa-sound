@@ -175,6 +175,76 @@ contract SensaSoundGameUpgradeableTest is Test {
         assertEq(usdc.balanceOf(alice), 1_000 * 1e6 - 10 * 1e6 + 16 * 1e6);
     }
 
+    function testMinimumStakeAllowsPointTwoUsdc() public {
+        bytes32 roundId = keccak256("min-stake-point-two");
+
+        vm.prank(alice);
+        game.depositStake(roundId, SensaSoundGameUpgradeable.Mode.DUEL, 200_000);
+
+        assertEq(game.stakes(roundId, alice), 200_000);
+    }
+
+    function testMinimumStakeRejectsBelowPointTwoUsdc() public {
+        bytes32 roundId = keccak256("min-stake-reject");
+
+        vm.prank(alice);
+        vm.expectRevert(SensaSoundGameUpgradeable.StakeTooLow.selector);
+        game.depositStake(roundId, SensaSoundGameUpgradeable.Mode.DUEL, 199_999);
+    }
+
+    function testFractionalDuelPayoutSplitForPointFiveUsdc() public {
+        bytes32 roundId = keccak256("fractional-duel-point-five");
+        vm.prank(alice);
+        game.depositStake(roundId, SensaSoundGameUpgradeable.Mode.DUEL, 500_000);
+        vm.prank(bob);
+        game.depositStake(roundId, SensaSoundGameUpgradeable.Mode.DUEL, 500_000);
+
+        (
+            address[] memory winners,
+            uint256[] memory rewards,
+            SensaSoundGameUpgradeable.Tier[] memory tiers,
+            uint256[] memory scores
+        ) = _oneWinner(alice, 800_000);
+
+        _resolve(roundId, winners, rewards, tiers, scores, 100_000, 100_000, false);
+
+        assertEq(game.balances(alice), 800_000);
+        assertEq(game.balances(devTreasury), 100_000);
+        assertEq(game.soloReserveBalance(), 100_000);
+    }
+
+    function testFractionalRoyalePayoutSplitForPointTwoUsdc() public {
+        bytes32 roundId = keccak256("fractional-royale-point-two");
+        address[5] memory players = [
+            alice,
+            bob,
+            makeAddr("carol"),
+            makeAddr("dave"),
+            makeAddr("erin")
+        ];
+
+        for (uint256 i = 0; i < players.length; i++) {
+            if (players[i] != alice && players[i] != bob) {
+                _fundAndApprove(players[i], 1_000 * 1e6);
+            }
+            vm.prank(players[i]);
+            game.depositStake(roundId, SensaSoundGameUpgradeable.Mode.ROYALE, 200_000);
+        }
+
+        (
+            address[] memory winners,
+            uint256[] memory rewards,
+            SensaSoundGameUpgradeable.Tier[] memory tiers,
+            uint256[] memory scores
+        ) = _oneWinner(alice, 800_000);
+
+        _resolve(roundId, winners, rewards, tiers, scores, 100_000, 100_000, false);
+
+        assertEq(game.balances(alice), 800_000);
+        assertEq(game.balances(devTreasury), 100_000);
+        assertEq(game.soloReserveBalance(), 100_000);
+    }
+
     function testPlayIncrementsCounter() public {
         vm.prank(alice);
         uint256 first = game.play();
@@ -474,7 +544,7 @@ contract SensaSoundGameUpgradeableTest is Test {
 
         vm.prank(bob);
         vm.expectRevert(SensaSoundGameUpgradeable.StakeTooLow.selector);
-        game.depositStake(keccak256("too-low"), SensaSoundGameUpgradeable.Mode.DUEL, 1e6 - 1);
+        game.depositStake(keccak256("too-low"), SensaSoundGameUpgradeable.Mode.DUEL, 200_000 - 1);
     }
 
     function testDepositToResolvedOrRefundedRoundReverts() public {
