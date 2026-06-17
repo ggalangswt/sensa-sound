@@ -1,12 +1,112 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sensa Sound Gameplay</title>
-    <script type="module" src="./src/main.ts"></script>
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Sound — How Good Is Your Ear?</title>
+<meta name="description" content="Listen to 5 tones, then recreate them from memory. A sound memory game.">
+<meta name="theme-color" content="#000000">
+<meta name="darkreader-lock">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8QSLBJW416"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-8QSLBJW416');</script>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>body{opacity:0;background:#000}body.ready{opacity:1;transition:opacity .15s ease}</style>
+</head>
+<body>
+
+<div id="audio-gate">
+  <div class="gate-sheet">
+    <div class="gate-handle"></div>
+    <svg class="gate-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.75 7.74986H5.35491C5.77433 7.74986 6.18314 7.618 6.52352 7.37293L11.4578 3.82021C11.7886 3.58208 12.25 3.81843 12.25 4.22598V19.7738C12.25 20.1813 11.7886 20.4177 11.4578 20.1795L6.52352 16.6268C6.18314 16.3817 5.77433 16.2499 5.35491 16.2499H3.75C2.64543 16.2499 1.75 15.3545 1.75 14.2499V9.74987C1.75 8.6453 2.64543 7.74986 3.75 7.74986Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.8891 8.11119C16.8844 9.10649 17.5 10.4815 17.5 12.0003C17.5 13.5191 16.8844 14.8941 15.8891 15.8894" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.2478 4.75181C21.1027 6.6067 22.25 9.1692 22.25 11.9997C22.25 14.8301 21.1027 17.3926 19.2478 19.2475" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="gate-line">Turn on your sound.</div>
+    <div class="gate-line">Put on your headphones.</div>
+    <button class="gate-btn">Got it</button>
+  </div>
+</div>
+
+<div id="game-container">
+
+  <!-- 1. Intro -->
+  <div id="intro-screen" class="screen active">
+    <canvas id="intro-wave-back"></canvas>
+    <canvas id="intro-wave-canvas"></canvas>
+    <h1 id="intro-title">sound</h1>
+    <div id="intro-body">
+      <p>Most people think they have a good ear. Some people are&nbsp;wrong.</p>
+      <p>We&rsquo;ll play you five tones, then you&rsquo;ll recreate them from&nbsp;memory.</p>
+    </div>
+    <div class="intro-mode-btns">
+      <button class="intro-mode-btn" id="intro-solo" aria-label="Play">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11.04-6.86a1 1 0 0 0 0-1.72L9.5 4.28a1 1 0 0 0-1.5.86Z" fill="currentColor"/></svg>
+      </button>
+      <button class="intro-easy-toggle easy" id="intro-easy" aria-label="Easy mode">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.75 12C1.75 8.54822 4.54822 5.75 8 5.75H16C19.4518 5.75 22.25 8.54822 22.25 12C22.25 15.4518 19.4518 18.25 16 18.25H8C4.54822 18.25 1.75 15.4518 1.75 12Z" stroke="currentColor" stroke-width="1.5"/><path class="toggle-knob" d="M12.75 12C12.75 10.2051 14.2051 8.75 16 8.75C17.7949 8.75 19.25 10.2051 19.25 12C19.25 13.7949 17.7949 15.25 16 15.25C14.2051 15.25 12.75 13.7949 12.75 12Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Easy</span>
+      </button>
+      <button class="intro-easy-toggle octave-toggle octave-off" id="intro-octave" aria-label="Octave mode">
+        <svg viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.75 12C1.75 8.548 4.548 5.75 8 5.75H28C31.452 5.75 34.25 8.548 34.25 12C34.25 15.452 31.452 18.25 28 18.25H8C4.548 18.25 1.75 15.452 1.75 12Z" stroke="currentColor" stroke-width="1.5"/><circle class="toggle-knob" cx="28" cy="12" r="3.25" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Octave</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. Countdown -->
+  <div id="countdown-screen" class="screen">
+    <div class="round-indicator" id="countdown-round"></div>
+    <div id="countdown-word"></div>
+  </div>
+
+  <!-- 3. Play (listen + tune) -->
+  <div id="play-screen" class="screen listening">
+    <div class="round-indicator" id="play-round"></div>
+    <span class="watermark" id="play-wm"></span>
+    <canvas id="play-canvas-back" class="play-canvas-layer"></canvas>
+    <canvas id="play-canvas-front" class="play-canvas-layer"></canvas>
+    <div id="timer-value"><span id="timer-int">3</span><span id="timer-dec">00</span></div>
+    <div id="timer-label">Seconds to remember</div>
+    <div id="play-hz"><span id="play-hz-num"></span><span id="play-hz-unit">Hz</span></div>
+    <button class="go-btn" id="play-go" aria-label="Submit tone"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 5.75L20.25 12L14 18.25" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.5 12H3.75" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+
+  <!-- 4. Result -->
+  <div id="result-screen" class="screen">
+    <div class="round-indicator" id="result-round"></div>
+    <div id="result-score"><span class="score-int">0</span><span class="score-dot">.</span><span class="score-dec">00</span></div>
+    <div id="result-feedback"></div>
+    <canvas id="result-canvas-back" class="result-canvas-layer"></canvas>
+    <canvas id="result-canvas-front" class="result-canvas-layer"></canvas>
+    <div id="result-hz">
+      <div id="result-target-hz"><span class="result-target-label hz-digit" id="result-target-label">target</span><span class="result-hz-num" id="result-target-num"></span><span class="result-hz-unit hz-digit" id="result-target-unit">Hz</span></div>
+      <div id="result-pick-hz"><span class="result-hz-num"></span><span class="result-hz-unit">Hz</span></div>
+    </div>
+    <button class="go-btn" id="result-go" aria-label="Next round"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 5.75L20.25 12L14 18.25" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.5 12H3.75" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+
+  <!-- 5. Total -->
+  <div id="total-screen" class="screen">
+    <div id="total-title">results</div>
+    <div id="total-description"></div>
+    <div id="total-score"><span class="score-int">0</span><span class="score-dot">.</span><span class="score-dec">00</span><span class="score-slash">/</span><span class="score-max">50</span></div>
+    <div id="total-rounds"></div>
+    <button id="total-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.25 6.25L17.75 17.75M17.75 6.25L6.25 17.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    <div id="total-actions">
+      <button id="total-play-again" class="go-btn go-text">Play again</button>
+    </div>
+  </div>
+
+</div>
+
+<button id="mute-toggle" aria-label="Toggle mute"><svg class="vol-on" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.2478 4.75181C21.1027 6.6067 22.25 9.1692 22.25 11.9997C22.25 14.8301 21.1027 17.3926 19.2478 19.2475M15.8891 8.11119C16.8844 9.10649 17.5 10.4815 17.5 12.0003C17.5 13.5191 16.8844 14.8941 15.8891 15.8894M3.75 7.74986H5.35491C5.77433 7.74986 6.18314 7.618 6.52352 7.37293L11.4578 3.82021C11.7886 3.58208 12.25 3.81843 12.25 4.22598V19.7738C12.25 20.1813 11.7886 20.4177 11.4578 20.1795L6.52352 16.6268C6.18314 16.3817 5.77433 16.2499 5.35491 16.2499H3.75C2.64543 16.2499 1.75 15.3545 1.75 14.2499V9.74987C1.75 8.6453 2.64543 7.74986 3.75 7.74986Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="vol-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M17 5.93934V4.22585C17 3.20697 15.8465 2.6161 15.0196 3.21143L10.0853 6.76415C9.87255 6.91732 9.61705 6.99973 9.35491 6.99973H7.75C6.23122 6.99973 5 8.23095 5 9.74973V14.2497C5 15.25 5.53405 16.1255 6.33257 16.6068L3.21967 19.7197C2.92678 20.0126 2.92678 20.4874 3.21967 20.7803C3.51256 21.0732 3.98744 21.0732 4.28033 20.7803L20.7803 4.28033C21.0732 3.98744 21.0732 3.51256 20.7803 3.21967C20.4874 2.92678 20.0126 2.92678 19.7197 3.21967L17 5.93934ZM7.47089 15.4685C6.91489 15.3416 6.5 14.8441 6.5 14.2497V9.74973C6.5 9.05938 7.05964 8.49973 7.75 8.49973H9.35491C9.93161 8.49973 10.4937 8.31842 10.9617 7.98145L15.5 4.71391V7.43934L7.47089 15.4685Z" fill="currentColor"/><path d="M15.5003 19.2857L11.0785 16.102L10.001 17.1795C10.0298 17.197 10.0581 17.2156 10.0856 17.2354L15.0199 20.7881C15.8468 21.3835 17.0003 20.7926 17.0003 19.7737V10.1802L15.5003 11.6802V19.2857Z" fill="currentColor"/></svg></button>
+<button id="dark-mode-toggle" aria-label="Toggle dark mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.9982 3.29083V1.76758M5.83985 18.1586L4.76275 19.2357M11.9982 22.2327V20.7094M19.2334 4.76468L18.1562 5.84179M20.707 12.0001H22.2303M18.1562 18.1586L19.2334 19.2357M1.76562 12.0001H3.28888M4.76267 4.76462L5.83977 5.84173M15.7104 8.28781C17.7606 10.3381 17.7606 13.6622 15.7104 15.7124C13.6601 17.7627 10.336 17.7627 8.28574 15.7124C6.23548 13.6622 6.23548 10.3381 8.28574 8.28781C10.336 6.23756 13.6601 6.23756 15.7104 8.28781Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.2481 11.8112C20.1889 12.56 18.8958 13 17.5 13C13.9101 13 11 10.0899 11 6.5C11 5.10416 11.44 3.81108 12.1888 2.75189C12.126 2.75063 12.0631 2.75 12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 11.9369 21.2494 11.874 21.2481 11.8112Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+<div id="error-screen" style="display:none;position:fixed;inset:0;z-index:99999;background:#000;color:#fff;flex-direction:column;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-align:center;padding:40px">
+  <div style="font-size:clamp(48px,12vw,96px);font-weight:700;letter-spacing:-0.04em;margin-bottom:24px">sound</div>
+  <p id="error-msg" style="font-size:18px;opacity:0.6;max-width:360px;line-height:1.5;margin:0">Something broke. That takes a special kind of talent.</p>
+  <button onclick="location.reload()" style="margin-top:32px;background:rgba(255,255,255,0.12);border:none;color:#fff;padding:12px 32px;border-radius:99px;font-size:16px;cursor:pointer;font-family:inherit;transition:background 0.2s">Try again</button>
+</div>
+
+<script type="module" src="/src/main.ts"></script>
 </html>

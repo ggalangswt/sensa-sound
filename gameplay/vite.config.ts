@@ -1,5 +1,5 @@
-import { defineConfig } from "vite";
 import path from "node:path";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   root: path.resolve(__dirname),
@@ -10,10 +10,5 @@ export default defineConfig({
   preview: {
     host: "127.0.0.1",
     port: 4173,
-  },
-  resolve: {
-    alias: {
-      "@sound": path.resolve(__dirname, "../src"),
-    },
   },
 });
