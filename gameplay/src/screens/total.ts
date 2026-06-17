@@ -5,8 +5,8 @@ import { SFX } from '../audio/sfx';
 import { analytics } from '../utils/analytics';
 import { getTotalDescription } from '../scoring';
 import { animateScoreClimb } from '../ui/score-animation';
-import { startIntroWave } from '../visual/intro-wave';
 import { trackEvent } from '../utils/gtag';
+import { startGame } from './game-flow';
 
 const totalScreen = document.getElementById('total-screen')!;
 const totalDesc = document.getElementById('total-description')!;
@@ -51,10 +51,7 @@ if (totalPlayAgainBtn) {
     trackEvent('play_again', { score: state.totalScore, mode: hardMode ? 'hard' : 'easy', octave: octaveShift });
     SFX.click();
     totalScreen.classList.remove('reveal');
-    const introScreen = document.getElementById('intro-screen')!;
-    show(introScreen);
-    startIntroWave();
-    SFX.droneStart();
+    startGame();
   });
 }
 
@@ -62,8 +59,5 @@ if (totalPlayAgainBtn) {
 totalClose.addEventListener('click', () => {
   SFX.clickClose();
   totalScreen.classList.remove('reveal');
-  const introScreen = document.getElementById('intro-screen')!;
-  show(introScreen);
-  startIntroWave();
-  SFX.droneStart();
+  startGame();
 });
