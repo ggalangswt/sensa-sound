@@ -12,6 +12,7 @@ function dismissAudioGate() {
   getCtx();
   SFX.droneStart();
   gate.classList.add('dismissed');
+  window.dispatchEvent(new CustomEvent('sensa:audio-ready'));
   setTimeout(() => { gate.style.display = 'none'; }, 500);
 }
 
