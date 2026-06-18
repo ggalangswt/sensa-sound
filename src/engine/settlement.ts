@@ -1,6 +1,5 @@
-import type { SettlementPreview } from "@sensa/shared";
-
 import { SOUND_DEFAULTS } from "../constants/game";
+import type { SettlementPreview } from "../types";
 
 export function buildSettlementPreview(args: {
   roomId: string;
