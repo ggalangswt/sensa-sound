@@ -7,6 +7,7 @@ import { drawDualWave, setDragIntensity, _dragIntensity } from '../visual/gradie
 import { scoreRound } from '../scoring';
 import { analytics } from '../utils/analytics';
 import { showResult } from './result';
+import { getInitPayload } from '../runtime';
 
 const playScreen = document.getElementById('play-screen')!;
 const playBackC = document.getElementById('play-canvas-back') as HTMLCanvasElement;
@@ -14,12 +15,15 @@ const playFrontC = document.getElementById('play-canvas-front') as HTMLCanvasEle
 const playRound = document.getElementById('play-round')!;
 const timerInt = document.getElementById('timer-int')!;
 const timerDec = document.getElementById('timer-dec')!;
+const timerLabel = document.getElementById('timer-label')!;
 const playHzNum = document.getElementById('play-hz-num')!;
 const playGo = document.getElementById('play-go')!;
 
 let _playNorm = 0.5;
 let _playPhase: 'listen' | 'tune' = 'listen';
 let _timerRaf: number | null = null;
+let _guessTimeout: ReturnType<typeof setTimeout> | null = null;
+let _tuneStartedAt = 0;
 let _roundLocked = false;
 
 export function resetRoundLock() {
@@ -30,6 +34,10 @@ export function cancelTimerRaf() {
   if (_timerRaf) {
     cancelAnimationFrame(_timerRaf);
     _timerRaf = null;
+  }
+  if (_guessTimeout) {
+    clearTimeout(_guessTimeout);
+    _guessTimeout = null;
   }
 }
 
@@ -45,10 +53,13 @@ export function runListen() {
   playScreen.classList.add('listening');
   playScreen.classList.remove('tuning');
 
-  const memDuration = hardMode ? 1250 : MEMORIZE_MS;
+  const memDuration =
+    getInitPayload()?.gameplayConfig.memorizeMs ??
+    (hardMode ? 1250 : MEMORIZE_MS);
   timerInt.textContent = String(Math.floor(memDuration / 1000));
   timerInt.className = '';
   timerDec.textContent = '00';
+  timerLabel.textContent = 'Seconds to remember';
   playHzNum.textContent = '';
 
   show(playScreen);
@@ -121,6 +132,27 @@ function transitionToTune() {
     if (playHzUnit) playHzUnit.style.opacity = hardMode ? '0' : '';
 
     playTone(freqFromNorm(_playNorm), 0.2);
+    _tuneStartedAt = performance.now();
+    const guessSeconds = getInitPayload()?.gameplayConfig.guessSeconds ?? 15;
+    timerLabel.textContent = 'Seconds to answer';
+    timerInt.textContent = String(guessSeconds);
+    timerDec.textContent = '00';
+
+    const updateGuessTimer = () => {
+      const elapsed = performance.now() - _tuneStartedAt;
+      const remaining = Math.max(0, guessSeconds * 1000 - elapsed);
+      const seconds = remaining / 1000;
+      const intPart = Math.floor(seconds);
+      timerInt.textContent = String(intPart);
+      timerDec.textContent = String(
+        Math.min(99, Math.floor((seconds - intPart) * 100)),
+      ).padStart(2, '0');
+      if (remaining > 0 && !_roundLocked) {
+        _timerRaf = requestAnimationFrame(updateGuessTimer);
+      }
+    };
+    _timerRaf = requestAnimationFrame(updateGuessTimer);
+    _guessTimeout = setTimeout(() => submitRound(), guessSeconds * 1000);
   }, 400);
 }
 
@@ -161,8 +193,7 @@ function transitionToTune() {
   playScreen.addEventListener('pointercancel', () => { dragging = false; decayIntensity(); });
 })();
 
-// Submit
-playGo.addEventListener('click', () => {
+function submitRound() {
   if (_roundLocked) return;
   _roundLocked = true;
   const playWm = document.getElementById('play-wm');
@@ -176,6 +207,8 @@ playGo.addEventListener('click', () => {
   const pick = _playNorm;
   const target = state.targets[state.round - 1];
   state.picks.push(pick);
+  const latencyMs = Math.max(0, Math.round(performance.now() - _tuneStartedAt));
+  state.latencies.push(latencyMs);
   const score = scoreRound(target, pick);
   state.roundScores.push(score);
   state.totalScore = Math.round((state.totalScore + score) * 100) / 100;
@@ -185,9 +218,13 @@ playGo.addEventListener('click', () => {
     score,
     target,
     pick,
+    latencyMs,
     mode: hardMode ? 'hard' : 'easy',
     octave: octaveShift,
   });
 
   showResult(target, pick, score);
-});
+}
+
+// Submit
+playGo.addEventListener('click', submitRound);
