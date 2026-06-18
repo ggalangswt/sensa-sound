@@ -6,6 +6,8 @@ import { initMuteToggle } from './ui/mute-toggle';
 import { initAudioGate } from './ui/audio-gate';
 import { initSfxGuard } from './ui/sfx-guard';
 import { startGame } from './screens/game-flow';
+import { getInitPayload, postToParent, setInitPayload } from './runtime';
+import type { SoundInitPayload } from './types';
 
 // Import screens to register their event listeners
 import './screens/intro';
@@ -46,6 +48,34 @@ setTimeout(() => {
   document.body.classList.add('ready');
 }, 2000);
 
-window.addEventListener('sensa:audio-ready', () => {
+let audioReady = false;
+let gameStarted = false;
+
+function maybeStartGame() {
+  if (!audioReady || gameStarted) return;
+  if (window.parent !== window && !getInitPayload()) return;
+  gameStarted = true;
   startGame();
-}, { once: true });
+}
+
+window.addEventListener('sensa:audio-ready', () => {
+  audioReady = true;
+  maybeStartGame();
+});
+
+window.addEventListener('message', (event: MessageEvent) => {
+  if (event.source !== window.parent) return;
+  const data = event.data as
+    | { type?: string; payload?: SoundInitPayload }
+    | undefined;
+  if (data?.type !== 'sensa-sound:init' || !data.payload) return;
+
+  setInitPayload(data.payload);
+  if (gameStarted) {
+    startGame();
+  } else {
+    maybeStartGame();
+  }
+});
+
+postToParent('sensa-sound:ready');
