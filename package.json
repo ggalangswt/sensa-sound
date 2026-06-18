@@ -5,6 +5,9 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -13,6 +16,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
+    "prepare": "npm run build",
     "game:dev": "vite --config gameplay/vite.config.ts",
     "game:build": "vite build --config gameplay/vite.config.ts",
     "game:preview": "vite preview --config gameplay/vite.config.ts --host 127.0.0.1 --port 4173",
@@ -20,7 +24,6 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@sensa/shared": "file:../sensa-shared",
     "simplex-noise": "^4.0.3"
   },
   "devDependencies": {
