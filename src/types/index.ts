@@ -56,3 +56,12 @@ export interface CanonicalScoreBreakdown {
   percent: number;
   perRound: SoundRoundResult[];
 }
+
+export interface SettlementPreview {
+  roomId: string;
+  grossPrizeUsd: number;
+  platformFeeUsd: number;
+  winnerWalletAddresses: string[];
+  splitPrizeUsd: number;
+  refund: boolean;
+}
