@@ -4,6 +4,7 @@ import {
   buildDailySeed,
   buildSettlementPreview,
   buildSoundGameplayConfig,
+  freqFromNorm,
   generateSoundRounds,
   scoreSoundSubmission,
 } from "../src/index";
@@ -39,6 +40,35 @@ describe("sound engine", () => {
     expect(result.total).toBeGreaterThanOrEqual(0);
     expect(result.total).toBeLessThanOrEqual(50);
     expect(result.total).toBe(50);
+  });
+
+  it("uses the Dialed frequency ranges as the canonical scale", () => {
+    expect(freqFromNorm(0, "easy")).toBe(80);
+    expect(freqFromNorm(1, "easy")).toBe(1200);
+    expect(freqFromNorm(0, "hard")).toBe(60);
+    expect(freqFromNorm(1, "hard")).toBe(1400);
+  });
+
+  it("ignores the client total and recomputes every round", () => {
+    const config = buildSoundGameplayConfig({
+      matchId: "client-total-is-untrusted",
+      difficulty: "easy",
+    });
+    const result = scoreSoundSubmission("client-total-is-untrusted", "easy", {
+      roomId: "room_3",
+      walletAddress: "0x1",
+      submittedAt: new Date().toISOString(),
+      difficulty: "easy",
+      octaveShift: 0,
+      totalScore: 50,
+      rounds: config.rounds.map((round) => ({
+        round: round.round,
+        pickedNorm: round.targetNorm === 0 ? 1 : 0,
+        latencyMs: 15_000,
+      })),
+    });
+
+    expect(result.total).toBeLessThan(50);
   });
 
   it("keeps the daily seed stable per UTC day", () => {
