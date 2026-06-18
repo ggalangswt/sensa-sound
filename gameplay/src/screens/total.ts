@@ -87,6 +87,13 @@ function applySubmissionResult(result: SoundSubmissionResult) {
 
 listenForSubmissionResult(applySubmissionResult);
 
+function exitToSoundMenu() {
+  window.parent?.postMessage({ type: 'sensa-sound:exit' }, '*');
+  if (window.parent === window) {
+    window.location.href = '/play/sound/';
+  }
+}
+
 export async function showTotal() {
   submissionPending = false;
   submissionAccepted = false;
