@@ -9,6 +9,7 @@ export const state: GameState = {
   roundScores: [],
   targets: [],
   picks: [],
+  latencies: [],
 };
 
 export function resetState() {
@@ -17,6 +18,7 @@ export function resetState() {
   state.roundScores = [];
   state.targets = [];
   state.picks = [];
+  state.latencies = [];
 }
 
 export function randomTarget(): number {
