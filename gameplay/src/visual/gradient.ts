@@ -1,6 +1,7 @@
 import type { CanvasSetup } from '../types';
 import { PI } from '../config';
 import { createNoise3D } from 'simplex-noise';
+import { SENSA_WAVE, SENSA_WAVE_ALT, type WaveStop } from '../theme/palette';
 
 export const noise3D = createNoise3D();
 export const _waveStart = performance.now();
@@ -9,20 +10,16 @@ export let _dragIntensity = 0;
 export function setDragIntensity(v: number) { _dragIntensity = v; }
 
 export const STRAND_COUNT = 24;
-const GRADIENT_STOPS = [
-  { pos: 0.0, r: 148, g: 45, b: 220 },
-  { pos: 0.25, r: 90, g: 60, b: 235 },
-  { pos: 0.5, r: 40, g: 100, b: 240 },
-  { pos: 0.75, r: 0, g: 180, b: 220 },
-  { pos: 1.0, r: 16, g: 240, b: 160 },
-];
-
-function gradientColor(t: number, alpha: number): string {
+function gradientColor(
+  t: number,
+  alpha: number,
+  stops: WaveStop[],
+): string {
   let i = 0;
-  for (let s = 1; s < GRADIENT_STOPS.length; s++) {
-    if (t <= GRADIENT_STOPS[s].pos) { i = s - 1; break; }
+  for (let s = 1; s < stops.length; s++) {
+    if (t <= stops[s].pos) { i = s - 1; break; }
   }
-  const a = GRADIENT_STOPS[i], b = GRADIENT_STOPS[i + 1] || a;
+  const a = stops[i], b = stops[i + 1] || a;
   const f = (b.pos === a.pos) ? 0 : (t - a.pos) / (b.pos - a.pos);
   const r = Math.round(a.r + (b.r - a.r) * f);
   const g = Math.round(a.g + (b.g - a.g) * f);
@@ -32,7 +29,8 @@ function gradientColor(t: number, alpha: number): string {
 
 function drawStrandsVertical(
   ctx: CanvasRenderingContext2D, w: number, h: number,
-  normFreq: number, t: number, opMul: number, lineWidth: number, noiseSeed: number
+  normFreq: number, t: number, opMul: number, lineWidth: number,
+  noiseSeed: number, stops: WaveStop[] = SENSA_WAVE,
 ) {
   const N = STRAND_COUNT;
   const nf = Math.pow(normFreq, 0.7);
@@ -68,7 +66,11 @@ function drawStrandsVertical(
     }
 
     const gradT = i / (N - 1);
-    ctx.strokeStyle = gradientColor(gradT, Math.min(op * dragBoost, 0.45 * opMul));
+    ctx.strokeStyle = gradientColor(
+      gradT,
+      Math.min(op * dragBoost, 0.45 * opMul),
+      stops,
+    );
     ctx.stroke();
   }
 
@@ -97,8 +99,8 @@ export function drawDualWave(
   const fr = setupCanvas(frontCanvas);
   if (!bk || !fr) return;
   const t = time != null ? time : (performance.now() - _waveStart) / 1000;
-  drawStrandsVertical(bk.ctx, bk.w, bk.h, normFreq, t, ga, 5, 1);
-  drawStrandsVertical(fr.ctx, fr.w, fr.h, normFreq, t, ga, 1.1, 1);
+  drawStrandsVertical(bk.ctx, bk.w, bk.h, normFreq, t, ga, 5, 1, SENSA_WAVE);
+  drawStrandsVertical(fr.ctx, fr.w, fr.h, normFreq, t, ga, 1.1, 1, SENSA_WAVE);
 }
 
 export function drawResultOverlay(
@@ -113,11 +115,11 @@ export function drawResultOverlay(
   const savedDrag = _dragIntensity;
   _dragIntensity = 0;
 
-  drawStrandsVertical(bk.ctx, bk.w, bk.h, targetNorm, t, 0.5, 5, 1);
-  drawStrandsVertical(fr.ctx, fr.w, fr.h, targetNorm, t, 0.5, 1.1, 1);
+  drawStrandsVertical(bk.ctx, bk.w, bk.h, targetNorm, t, 0.5, 5, 1, SENSA_WAVE);
+  drawStrandsVertical(fr.ctx, fr.w, fr.h, targetNorm, t, 0.5, 1.1, 1, SENSA_WAVE);
 
-  drawStrandsVertical(bk.ctx, bk.w, bk.h, pickNorm, t + 100, 1, 5, 2);
-  drawStrandsVertical(fr.ctx, fr.w, fr.h, pickNorm, t + 100, 1, 1.1, 2);
+  drawStrandsVertical(bk.ctx, bk.w, bk.h, pickNorm, t + 100, 1, 5, 2, SENSA_WAVE_ALT);
+  drawStrandsVertical(fr.ctx, fr.w, fr.h, pickNorm, t + 100, 1, 1.1, 2, SENSA_WAVE_ALT);
 
   _dragIntensity = savedDrag;
 }
@@ -151,7 +153,11 @@ export function drawIntroWaveLayer(
       if (y === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
-    ctx.strokeStyle = gradientColor(i / (N - 1), Math.min(op, 0.5 * opMul));
+    ctx.strokeStyle = gradientColor(
+      i / (N - 1),
+      Math.min(op, 0.5 * opMul),
+      SENSA_WAVE,
+    );
     ctx.stroke();
   }
   ctx.globalCompositeOperation = 'source-over';

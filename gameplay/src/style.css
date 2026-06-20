@@ -19,15 +19,15 @@
   0%   { transform: translateY(30%); filter: blur(4px); opacity: 0; }
   100% { transform: translateY(0); filter: blur(0); opacity: 1; }
 }
-@keyframes placeholderShimmer {
-  0%   { background-position: 150% center; }
-  100% { background-position: -50% center; }
+@keyframes placeholderPulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.8; }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; background: #000; overscroll-behavior: none; touch-action: none; }
 body { touch-action: manipulation; }
 body {
-  font-family: 'Suisse Intl S Alt', -apple-system, 'Inter', system-ui, sans-serif;
+  font-family: 'Suisse Intl S Alt', -apple-system, system-ui, sans-serif;
   font-weight: 500; -webkit-font-smoothing: antialiased;
   user-select: none; -webkit-user-select: none;
   color: #fff;
@@ -38,13 +38,10 @@ body.ready { opacity: 1; }
 .shimmer-placeholder {
   position: absolute; top: 0; left: 24px; right: 24px; bottom: 0;
   display: flex; align-items: center; pointer-events: none;
-  font-family: 'Suisse Intl S Alt', -apple-system, 'Inter', system-ui, sans-serif;
+  font-family: 'Suisse Intl S Alt', -apple-system, system-ui, sans-serif;
   font-weight: 500; font-size: 16px; letter-spacing: -0.32px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.45) 30%, rgba(255,255,255,0.75) 50%, rgba(255,255,255,0.45) 70%, rgba(255,255,255,0.2) 100%);
-  background-size: 200% 100%;
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: placeholderShimmer 3.5s linear infinite;
+  color: var(--sensa-purple-muted, rgba(255,255,255,0.6));
+  animation: placeholderPulse 1.8s ease-in-out infinite;
   transition: opacity 0.2s ease;
 }
 .shimmer-placeholder.hidden { opacity: 0; }
@@ -360,9 +357,6 @@ body.ready { opacity: 1; }
 .round-col-score.loser { color: rgba(255,255,255,0.25); }
 .round-col-vs.winner { color: rgba(255,255,255,0.5); }
 .round-col-vs.loser { color: rgba(255,255,255,0.2); }
-#dark-mode-toggle {
-  display: none;
-}
 #mute-toggle {
   display: none;
 }
@@ -460,28 +454,10 @@ body.ready { opacity: 1; }
   #total-description { margin: var(--cp) 0 0 var(--cp); font-size: 15px; padding-right: 50px; }
   #total-score { margin: 0 0 0 var(--cp); }
   #total-rounds { margin: 20px var(--cp) 0; }
-  #dark-mode-toggle {
-    display: block;
-    position: fixed;
-    bottom: 30px; right: 30px;
-    width: 24px; height: 24px;
-    background: none; border: none; padding: 0;
-    cursor: pointer; color: #000;
-    transition: color 0.5s ease, transform 0.15s ease;
-  }
-  #dark-mode-toggle svg {
-    position: absolute; inset: 0;
-    width: 24px; height: 24px;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-  #dark-mode-toggle .icon-moon { opacity: 0; transform: scale(0); }
-  #dark-mode-toggle .icon-sun { opacity: 1; transform: scale(1); }
-  #dark-mode-toggle:hover { transform: scale(1.12); }
-  #dark-mode-toggle:active { transform: scale(0.92); }
   #mute-toggle {
     display: block;
     position: fixed;
-    bottom: 30px; right: 66px;
+    bottom: 30px; right: 30px;
     width: 24px; height: 24px;
     background: none; border: none; padding: 0;
     cursor: pointer; color: #000;
@@ -498,12 +474,6 @@ body.ready { opacity: 1; }
   #mute-toggle.muted .vol-on { opacity: 0; transform: scale(0); }
   #mute-toggle:hover { transform: scale(1.12); }
   #mute-toggle:active { transform: scale(0.92); }
-  body.dark-mode #mute-toggle { color: #cacaca; }
-  html.dark-mode, body.dark-mode { background: #2f2f2f; }
-  body.dark-mode #game-container {
-    box-shadow: 0px 4px 16px 0px rgba(0,0,0,0.5), 0px 34px 44px 0px rgba(0,0,0,0.3);
-  }
-  body.dark-mode #dark-mode-toggle { color: #cacaca; }
   #total-close {
     top: var(--cp); right: var(--cp);
     width: auto; height: auto; background: none; border-radius: 0;
