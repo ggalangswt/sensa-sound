@@ -1,7 +1,7 @@
 import './style.css';
+import './theme/sensa-theme.css';
 import { initAudioListeners } from './audio/context';
 import { initAllShimmers } from './utils/dom';
-import { initDarkMode } from './ui/dark-mode';
 import { initMuteToggle } from './ui/mute-toggle';
 import { initAudioGate } from './ui/audio-gate';
 import { initSfxGuard } from './ui/sfx-guard';
@@ -32,7 +32,6 @@ window.onerror = function (msg, src) {
 
 // Init
 initAudioListeners();
-initDarkMode();
 initMuteToggle();
 initAudioGate();
 
