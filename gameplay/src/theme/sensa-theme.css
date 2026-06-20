@@ -1,0 +1,171 @@
+:root {
+  --sensa-lime: #fdfb51;
+  --sensa-lime-soft: #fffec8;
+  --sensa-purple: #422057;
+  --sensa-purple-deep: #16071f;
+  --sensa-purple-panel: #261232;
+  --sensa-purple-muted: #b99fc8;
+  --sensa-ink-on-dark: #fffee8;
+  --sensa-line: #7b4f96;
+}
+
+html,
+body {
+  background: var(--sensa-purple);
+}
+
+body {
+  color: var(--sensa-ink-on-dark);
+}
+
+.screen,
+#intro-screen,
+#countdown-screen,
+#play-screen,
+#result-screen,
+#total-screen {
+  background: var(--sensa-purple-deep);
+  color: var(--sensa-ink-on-dark);
+}
+
+.screen::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 50% 8%, rgb(253 251 81 / 0.08), transparent 28%),
+    linear-gradient(180deg, var(--sensa-purple-panel), var(--sensa-purple-deep) 42%);
+  content: "";
+  pointer-events: none;
+}
+
+.round-indicator,
+#timer-label,
+.result-target-label {
+  color: var(--sensa-lime);
+}
+
+#timer-value,
+#countdown-word,
+#result-score,
+#total-score,
+.result-hz-num,
+#play-hz {
+  color: var(--sensa-ink-on-dark);
+}
+
+#timer-dec,
+.score-slash,
+.score-max {
+  color: var(--sensa-purple-muted);
+  opacity: 1;
+}
+
+#result-feedback,
+#total-description,
+#intro-body {
+  color: var(--sensa-purple-muted);
+}
+
+.go-btn,
+.intro-mode-btn {
+  background: var(--sensa-lime);
+  color: var(--sensa-purple);
+  box-shadow: inset 0 -3px 0 rgb(66 32 87 / 0.24);
+}
+
+.go-btn svg path {
+  stroke: currentColor;
+}
+
+.go-btn:focus-visible,
+.intro-mode-btn:focus-visible,
+#total-close:focus-visible,
+.gate-btn:focus-visible {
+  outline: 2px solid var(--sensa-lime);
+  outline-offset: 3px;
+}
+
+#result-target-hz {
+  color: var(--sensa-lime-soft);
+  opacity: 0.72;
+}
+
+#total-rounds {
+  border-block: 1px solid var(--sensa-line);
+  padding-block: 18px;
+}
+
+.round-col-label {
+  color: var(--sensa-purple-muted);
+}
+
+.round-col-score,
+.round-col-score.winner {
+  color: var(--sensa-lime);
+}
+
+.round-col-score.loser,
+.round-col-vs.loser {
+  color: var(--sensa-purple-muted);
+}
+
+#total-close {
+  background: var(--sensa-purple-panel);
+  color: var(--sensa-lime);
+}
+
+#audio-gate {
+  background: rgb(22 7 31 / 0.86);
+}
+
+#audio-gate .gate-sheet {
+  background: var(--sensa-purple-panel);
+  color: var(--sensa-ink-on-dark);
+}
+
+#audio-gate .gate-handle {
+  background: var(--sensa-line);
+}
+
+#audio-gate .gate-icon {
+  color: var(--sensa-lime);
+}
+
+#audio-gate .gate-line {
+  color: var(--sensa-ink-on-dark);
+}
+
+#audio-gate .gate-sub {
+  color: var(--sensa-purple-muted);
+}
+
+#audio-gate .gate-btn {
+  background: var(--sensa-lime);
+  color: var(--sensa-purple);
+}
+
+@media (min-width: 768px) {
+  html,
+  body {
+    background: var(--sensa-purple);
+  }
+
+  #game-container {
+    background: var(--sensa-purple-deep);
+    outline: 2px solid var(--sensa-purple);
+    box-shadow: 6px 6px 0 var(--sensa-purple-deep);
+  }
+
+  #mute-toggle {
+    color: var(--sensa-lime);
+  }
+
+  #audio-gate {
+    background: rgb(22 7 31 / 0.94);
+  }
+
+  #audio-gate .gate-sheet {
+    background: transparent;
+  }
+}
