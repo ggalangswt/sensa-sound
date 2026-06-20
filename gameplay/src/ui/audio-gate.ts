@@ -1,15 +1,37 @@
-import { getCtx } from '../audio/context';
+import { unlockAudio } from '../audio/context';
 import { SFX } from '../audio/sfx';
 import { trackEvent } from '../utils/gtag';
 
 let _droneStarted = false;
+let _unlocking = false;
 
-function dismissAudioGate() {
+async function dismissAudioGate() {
   const gate = document.getElementById('audio-gate');
-  if (!gate || _droneStarted) return;
+  if (!gate || _droneStarted || _unlocking) return;
+  const gateBtn = gate.querySelector('.gate-btn') as HTMLButtonElement | null;
+  const gateSub = gate.querySelector('.gate-sub') as HTMLElement | null;
+
+  _unlocking = true;
+  if (gateBtn) {
+    gateBtn.disabled = true;
+    gateBtn.textContent = 'Turning on...';
+  }
+
+  const unlocked = await unlockAudio();
+  if (!unlocked) {
+    _unlocking = false;
+    if (gateBtn) {
+      gateBtn.disabled = false;
+      gateBtn.textContent = 'Try again';
+    }
+    if (gateSub) {
+      gateSub.textContent = 'Sound is blocked. Turn up media volume, then try again.';
+    }
+    return;
+  }
+
   _droneStarted = true;
   trackEvent('audio_gate_dismiss');
-  getCtx();
   SFX.droneStart();
   gate.classList.add('dismissed');
   window.dispatchEvent(new CustomEvent('sensa:audio-ready'));
@@ -26,15 +48,16 @@ export function initAudioGate() {
 
   if (gateBtn) {
     gateBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
-      dismissAudioGate();
+      void dismissAudioGate();
     });
   }
 
   if (isDesktop) {
-    gate.addEventListener('click', dismissAudioGate);
+    gate.addEventListener('click', () => void dismissAudioGate());
     gate.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') dismissAudioGate();
+      if (e.key === 'Enter' || e.key === ' ') void dismissAudioGate();
     });
     return;
   }
@@ -77,7 +100,7 @@ export function initAudioGate() {
     const fraction = dy / sheetH;
 
     if (fraction > DISMISS_THRESHOLD || velocityY > VELOCITY_THRESHOLD) {
-      dismissAudioGate();
+      void dismissAudioGate();
     } else {
       gateSheet.style.transform = 'translateY(0)';
     }
@@ -88,6 +111,6 @@ export function initAudioGate() {
   gateSheet.addEventListener('touchend', onEnd);
 
   gate.addEventListener('click', (e) => {
-    if (e.target === gate) dismissAudioGate();
+    if (e.target === gate) void dismissAudioGate();
   });
 }
