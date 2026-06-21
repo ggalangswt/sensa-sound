@@ -1,28 +1,48 @@
 import type { GeneratedRound, SoundDifficulty, SoundGameplayConfig, SoundGameplayRound, SoundOctaveShift } from "../types";
 
 import { SOUND_DEFAULTS } from "../constants/game";
-import { seededUnit } from "./random";
+import { createSeededRandom, shuffleSeeded } from "./random";
 import { effectiveTargetFrequency, maxFreq, minFreq } from "./tone";
+
+export function targetNormRange(
+  difficulty: SoundDifficulty,
+  octaveShift: SoundOctaveShift,
+): readonly [number, number] {
+  const loBase = 0.1;
+  const hiBase = 0.9;
+  const scale = Math.log(maxFreq(difficulty) / minFreq(difficulty));
+  const lo =
+    octaveShift === -1
+      ? Math.max(
+          loBase,
+          Math.log((minFreq(difficulty) * 2) / minFreq(difficulty)) / scale,
+        )
+      : loBase;
+  const hi =
+    octaveShift === 1
+      ? Math.min(
+          hiBase,
+          Math.log((maxFreq(difficulty) / 2) / minFreq(difficulty)) / scale,
+        )
+      : hiBase;
+
+  return [lo, hi] as const;
+}
 
 export function generateSoundRounds(
   seed: string,
   difficulty: SoundDifficulty,
   octaveShift: SoundOctaveShift = 0,
 ): SoundGameplayRound[] {
-  const loBase = 0.1;
-  const hiBase = 0.9;
-  const lo =
-    octaveShift === -1
-      ? Math.max(loBase, Math.log((minFreq(difficulty) * 2) / minFreq(difficulty)) / Math.log(maxFreq(difficulty) / minFreq(difficulty)))
-      : loBase;
-  const hi =
-    octaveShift === 1
-      ? Math.min(hiBase, Math.log((maxFreq(difficulty) / 2) / minFreq(difficulty)) / Math.log(maxFreq(difficulty) / minFreq(difficulty)))
-      : hiBase;
+  const [lo, hi] = targetNormRange(difficulty, octaveShift);
+  const random = createSeededRandom(seed);
+  const zoneWidth = (hi - lo) / SOUND_DEFAULTS.rounds;
+  const targets = Array.from({ length: SOUND_DEFAULTS.rounds }, (_, zone) => {
+    return lo + zoneWidth * (zone + random());
+  });
 
-  return Array.from({ length: SOUND_DEFAULTS.rounds }, (_, index) => {
+  return shuffleSeeded(targets, random).map((targetNorm, index) => {
     const round = index + 1;
-    const targetNorm = lo + seededUnit(seed, `target:${round}`) * (hi - lo);
 
     return {
       round,
