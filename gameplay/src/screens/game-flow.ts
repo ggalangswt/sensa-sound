@@ -1,10 +1,11 @@
 import { ROUNDS, hardMode, octaveShift } from '../config';
-import { state, randomTarget, resetState } from '../state';
+import { state, resetState } from '../state';
 import { stopIntroWave } from '../visual/intro-wave';
 import { SFX } from '../audio/sfx';
 import { analytics } from '../utils/analytics';
 import { runCountdown } from './countdown';
 import { getInitPayload } from '../runtime';
+import { generateSoundRounds } from '../../../src/engine/generator';
 
 export let _gameStarting = false;
 export function setGameStarting(v: boolean) { _gameStarting = v; }
@@ -17,7 +18,12 @@ export function startGame() {
   if (runtimeConfig) {
     state.targets = runtimeConfig.rounds.map((round) => round.targetNorm);
   } else {
-    for (let i = 0; i < ROUNDS; i++) state.targets.push(randomTarget());
+    const seed = crypto.randomUUID();
+    state.targets = generateSoundRounds(
+      seed,
+      hardMode ? 'hard' : 'easy',
+      octaveShift,
+    ).map((round) => round.targetNorm);
   }
 
   stopIntroWave();
