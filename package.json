@@ -20,7 +20,7 @@
     "game:dev": "vite --config gameplay/vite.config.ts",
     "game:build": "vite build --config gameplay/vite.config.ts",
     "game:preview": "vite preview --config gameplay/vite.config.ts --host 127.0.0.1 --port 4173",
-    "test": "vitest run test/sound.test.ts",
+    "test": "vitest run test/*.test.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

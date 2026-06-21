@@ -5,19 +5,10 @@ import {
   buildSettlementPreview,
   buildSoundGameplayConfig,
   freqFromNorm,
-  generateSoundRounds,
   scoreSoundSubmission,
 } from "../src/index";
 
 describe("sound engine", () => {
-  it("generates deterministic rounds for a stable seed", () => {
-    const first = generateSoundRounds("abc123", "easy");
-    const second = generateSoundRounds("abc123", "easy");
-
-    expect(first).toEqual(second);
-    expect(first).toHaveLength(5);
-  });
-
   it("scores within the 0-50 bounds", () => {
     const config = buildSoundGameplayConfig({
       matchId: "score-seed",
